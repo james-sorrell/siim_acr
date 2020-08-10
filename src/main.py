@@ -1,6 +1,7 @@
 import inferenceHelpers as ih
 import dataHelpers as dh
 import plottingHelpers as ph
+import testingHelpers as th
 
 """ Core Pipeline for Program Execution """
 #%% Cells for Spyder Execution
@@ -18,11 +19,13 @@ pc = ph.PlottingController()
 #%% Data Analysis
 # pc.data_analysis(dc.train_data)
 #%%
-dg = dh.DataGenerator(dc.train_data)
+img_size = 256
+dg = dh.DataGenerator(dc.train_data, img_size)
 #%%
-# dg.splitSelectedData()
-# dg.generateBatches(dg.X_train)
-# dg.generateBatches(dg.X_val)
+# Take 1% of the data for Visualisation Purposes
+# For the best possible model we shouldn't do this
+# as we likely want to make use of all of the data
+X_train, X_val = dg.splitSelectedData(0.01)
 #%%
 for X, y in dg.generateBatches(dg.selected_train_data['file_path'].values):
     print("X: {}".format(X.shape))
@@ -32,11 +35,18 @@ for X, y in dg.generateBatches(dg.selected_train_data['file_path'].values):
     break
 #%%
 #%% Inference Controller
-ic = ih.InferenceController()
+ic = ih.InferenceController(img_size=img_size)
 #%%
-print("Training Data Length: {}".format(len(dg.selected_train_data)))
-steps_per_epoch = len(dg.selected_train_data) // dg.batch_size
+# dataset = dg.selected_train_data
+dataset = X_train
+print("Training Data Length: {}".format(len(dataset)))
+epochs = 10
+steps_per_epoch = len(dataset) // (dg.batch_size*epochs)
+print("Steps per epoch: {}".format(steps_per_epoch))
 #%%
-generator = dg.generateBatches(dg.selected_train_data['file_path'].values)
+generator = dg.generateBatches(dataset)
 #%%
-ic.train(generator, steps_per_epoch)
+model_path = ic.train(generator, epochs, steps_per_epoch)
+#%%
+# Testing
+th.analyse_data('../models/2020-11-08-00-05.h5', dg.generateBatches(X_val), img_size)

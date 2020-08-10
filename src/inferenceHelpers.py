@@ -7,6 +7,7 @@ Inference Helper Functions and Classes to process SIIM ACR Data
 """
 
 # Imports for Inference
+import datetime
 import tensorflow as tf
 from tensorflow import reduce_sum
 from tensorflow.keras.backend import pow
@@ -20,16 +21,19 @@ class InferenceController():
     Class that handles Inference and Preprocessing
     """
 
-    def __init__(self, img_size=256, lr=0.01, eps=0.1):
+    def __init__(self, img_size, lr=0.01, eps=0.1):
         self.img_size = img_size
         self.ResUNet()
         adam = tf.keras.optimizers.Adam(lr=lr, epsilon=eps)
         self.model.compile(optimizer=adam, loss=self.bce_dice_loss, metrics=[self.dsc])
                
-    def train(self, generator, steps_per_epoch):
+    def train(self, generator, epochs, steps_per_epoch):
         # running more epoch to see if we can get better results
-        history = self.model.fit(generator, steps_per_epoch=steps_per_epoch, epochs=10, verbose=1)
-        self.model.save('test.h5')
+        history = self.model.fit(generator, steps_per_epoch=steps_per_epoch, epochs=epochs, verbose=1)
+        timestr = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        path = '../models/{}.h5'.format(timestr)
+        self.model.save(path)
+        return path
         
     def bn_act(self, x, act=True):
         'batch normalization layer with an optinal activation layer'

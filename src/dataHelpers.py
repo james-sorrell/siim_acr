@@ -98,8 +98,12 @@ class DataGenerator():
     Will supply data lazily for ML Inference.
     """
     
-    def __init__(self, train_data):
+    def __init__(self, train_data, img_size, batch_size=16, channels=1):
+        # Data Generator configurations
         self.train_data = train_data
+        self.img_size = img_size
+        self.channels = channels
+        self.batch_size = batch_size
         # Generate Masks for use in Data Generator
         self.masks = {}
         for index, row in self.train_data[self.train_data['pneumothorax']==1].iterrows():
@@ -114,11 +118,13 @@ class DataGenerator():
         drop_data = self.selected_train_data[self.selected_train_data['pneumothorax']==False].sample(num_negative_drop).index
         self.selected_train_data = self.selected_train_data.drop(drop_data)
         
-    # def splitSelectedData(self, val_size=0.2):
-    #     """ Split dataset for training and validation """
-    #     # Split Dataset
-    #     self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.selected_train_data.index, self.selected_train_data['pneumothorax'].values, test_size=val_size, random_state=42)
-    #     self.X_train, self.X_val = self.selected_train_data.loc[self.X_train]['file_path'].values, self.selected_train_data.loc[self.X_val]['file_path'].values
+    def splitSelectedData(self, val_size=0.2):
+        """ Split dataset for training and validation """
+        # Shuffle first
+        self.selected_train_data = self.selected_train_data.sample(frac=1).reset_index(drop=True)
+        # Split Dataset
+        X_train, X_val, _, _ = train_test_split(self.selected_train_data.index, self.selected_train_data['pneumothorax'].values, test_size=val_size, random_state=42)
+        return self.selected_train_data.loc[X_train]['file_path'].values, self.selected_train_data.loc[X_val]['file_path'].values
         
     def prepareImages(self, file_list):
         """ Takes list of files and returns preprocessed images/labels for training """
@@ -152,18 +158,14 @@ class DataGenerator():
         y = (y > 0).astype(np.float64)
         return X, y
         
-    def generateBatches(self, fns, batch_size=16, img_size=256, channels=1, shuffle=True):
+    def generateBatches(self, fns, shuffle=True):
         """ Generate Data to Supply to Fit Function """
         
         # self.selected_train_data['file_path']
         # fns = data['file_path'].values
         if shuffle is True:
             random.shuffle(fns)
-            
-        # Data Generator configurations
-        self.channels = channels
-        self.img_size = img_size
-        self.batch_size = batch_size
+
             
         total_data = len(fns)
         batches = 0

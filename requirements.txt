@@ -1,2 +1,4 @@
 pydicom
 tqdm
+tensorflow
+opencv-python
