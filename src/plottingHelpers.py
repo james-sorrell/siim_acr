@@ -102,17 +102,17 @@ class PlottingController():
         # plt.ylabel("Counts")
         # plt.show()
         
-        # total_samples = len(train_data)
-        # print("Total Number of Training Samples: {}".format(total_samples))
-        # positive_count = train_data['pneumothorax'].sum()
-        # positive_percentage = 100*(positive_count/total_samples)
-        # print("Pneumothorax Positive count: {} -> {:.2f}%".format(positive_count, positive_percentage))
-        # missing = train_data[train_data['encoded_pixels_count']==0]['encoded_pixels_count'].count()
-        # missing_percentage = 100*(missing/positive_count)
-        # print("Number of x-rays with missing labels: {} -> {:.2f}%".format(missing, missing_percentage))
-        # negative_count = len(train_data)-positive_count
-        # negative_percentage = 100*(negative_count/total_samples)
-        # print("Pneumothorax Negative count: {} -> {:.2f}".format(negative_count, negative_percentage))
+        total_samples = len(train_data)
+        print("Total Number of Training Samples: {}".format(total_samples))
+        positive_count = train_data['pneumothorax'].sum()
+        positive_percentage = 100*(positive_count/total_samples)
+        print("Pneumothorax Positive count: {} -> {:.2f}%".format(positive_count, positive_percentage))
+        missing = train_data[train_data['encoded_pixels_count']==0]['encoded_pixels_count'].count()
+        missing_percentage = 100*(missing/positive_count)
+        print("Number of x-rays with missing labels: {} -> {:.2f}%".format(missing, missing_percentage))
+        negative_count = len(train_data)-positive_count
+        negative_percentage = 100*(negative_count/total_samples)
+        print("Pneumothorax Negative count: {} -> {:.2f}".format(negative_count, negative_percentage))
 
     
     def bounding_box(self, img):
