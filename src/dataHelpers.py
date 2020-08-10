@@ -149,10 +149,10 @@ class DataGenerator():
         
         # Normalise
         X = X/255
-        y = (y > 0).astype(int)
+        y = (y > 0).astype(np.float64)
         return X, y
         
-    def generateBatches(self, fns, batch_size=32, img_size=512, channels=1, shuffle=True):
+    def generateBatches(self, fns, batch_size=16, img_size=256, channels=1, shuffle=True):
         """ Generate Data to Supply to Fit Function """
         
         # self.selected_train_data['file_path']

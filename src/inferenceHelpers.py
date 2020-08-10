@@ -20,7 +20,7 @@ class InferenceController():
     Class that handles Inference and Preprocessing
     """
 
-    def __init__(self, img_size=512, lr=0.01, eps=0.1):
+    def __init__(self, img_size=256, lr=0.01, eps=0.1):
         self.img_size = img_size
         self.ResUNet()
         adam = tf.keras.optimizers.Adam(lr=lr, epsilon=eps)
