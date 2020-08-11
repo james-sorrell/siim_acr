@@ -112,7 +112,7 @@ class DataGenerator():
         if crop_data is True:   
             self.selectData()
 
-    def selectData(self, negative_ratio=100):
+    def selectData(self, negative_ratio=1):
         """ Configurations for what data should be removed from the dataset 
             Negative ratio defined to be 1:x Positive to Negative Samples
         """
@@ -180,7 +180,7 @@ class DataGenerator():
             img, mask = self.vertical_flip(img, mask)
         # rotation
         if self.chance(75):
-            angle = int(random.uniform(-30, 30))
+            angle = int(random.uniform(-40, 40))
             img, mask = self.rotate(img, mask, angle)
         return img, mask
 
