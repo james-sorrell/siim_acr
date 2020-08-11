@@ -46,8 +46,8 @@ def main(model_path):
         dataset = X_train
         #dataset = training_dg.selected_data['file_path'].values 
         print("Training Data Length: {}".format(len(dataset)))
-        epochs = 10
-        augmentation_factor = 100
+        epochs = 100
+        augmentation_factor = 10
         steps_per_epoch = (len(dataset)*augmentation_factor) // (training_dg.batch_size*epochs)
         print("Steps per epoch: {}".format(steps_per_epoch))
         generator = training_dg.generateBatches(dataset, augmentation_factor)

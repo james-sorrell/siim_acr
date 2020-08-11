@@ -173,7 +173,7 @@ class DataGenerator():
             img, mask = self.horizontal_flip(img, mask)
         # rotation
         if self.chance(90):
-            angle = int(random.uniform(-30, 30))
+            angle = int(random.uniform(-40, 40))
             img, mask = self.rotate(img, mask, angle)
         return img, mask
 
