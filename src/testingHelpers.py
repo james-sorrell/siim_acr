@@ -34,13 +34,12 @@ def remove_small_regions(img, size):
     img = morphology.remove_small_holes(img, size)
     return img
 
-def prediction_post_processing(self, img_size):
+def prediction_post_processing(pred, img_size):
     """ Post processing pipeline for predictions """
-    pred = np.reshape(predictions[idx], (img_size, img_size))
     pred = pred > 0.5
     return remove_small_regions(pred, 0.02*img_size)
 
-def analyse_data(model_path, generator, img_size):
+def plot_results(model_path, generator, img_size):
     """ Load model from path and test it """
     model = tf.keras.models.load_model(model_path, compile=False)
     # lets loop over the predictions and print some good-ish results
@@ -53,8 +52,29 @@ def analyse_data(model_path, generator, img_size):
                 #if y[idx].sum() > 0 and count <= 15: 
                     img = np.reshape(x[idx]* 255, (img_size, img_size))
                     mask = np.reshape(y[idx]* 255, (img_size, img_size))
+                    pred = np.reshape(predictions[idx], (img_size, img_size))
                     pred = prediction_post_processing(pred, img_size)
                     # Scale for visualisation
                     pred = pred * 255
                     plot_train(img, mask, pred)
                     count += 1
+
+def dice_coefficient(true, pred):
+    """ Simple function to calculate dice loss coefficient """
+    # Dice Coefficient is 2 * the Area of Overlap divided by the total number of pixels in both images.
+    return np.sum(pred[true==1])*2.0 / (np.sum(pred) + np.sum(true))
+
+def analyse_results(model_path, generator, img_size):
+    """ Generate some metrics for model performance """
+    model = tf.keras.models.load_model(model_path, compile=False)
+    sum = 0
+    count = 0
+    for x, y in generator:
+        predictions = model.predict(x)
+        for idx, val in enumerate(x):
+            mask = np.reshape(y[idx]* 255, (img_size, img_size))
+            pred = np.reshape(predictions[idx], (img_size, img_size))
+            dice_coef = dice_coefficient(mask, pred)
+            sum += dice_coef
+            count += 1
+    print("Mean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count))

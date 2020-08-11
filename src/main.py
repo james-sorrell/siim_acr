@@ -20,32 +20,39 @@ pc = ph.PlottingController()
 # pc.data_analysis(dc.train_data)
 #%%
 img_size = 256
-dg = dh.DataGenerator(dc.train_data, img_size)
+training_dg = dh.DataGenerator(dc.train_data, img_size)
 #%%
-# Take 1% of the data for Visualisation Purposes
+# Take small % of the data for Visualisation Purposes
 # For the best possible model we shouldn't do this
 # as we likely want to make use of all of the data
-X_train, X_val = dg.splitSelectedData(0.01)
+X_train, X_val = training_dg.splitSelectedData(0.01)
 #%%
-for X, y in dg.generateBatches(dg.selected_train_data['file_path'].values):
+for X, y in training_dg.generateBatches(X_train):
     print("X: {}".format(X.shape))
     print("y: {}".format(y.shape))
     print("X type: {}".format(X.dtype))
-    print("Y type: {}".format(y.dtype))
+    print("Y type: {}\n".format(y.dtype))
     break
 #%%
 ic = ih.InferenceController(img_size=img_size)
 #%%
-# dataset = dg.selected_train_data
 dataset = X_train
+#dataset = training_dg.selected_data['file_path'].values 
 print("Training Data Length: {}".format(len(dataset)))
 epochs = 10
-steps_per_epoch = len(dataset) // (dg.batch_size*epochs)
+augmentation_factor = 100
+steps_per_epoch = (len(dataset)*augmentation_factor) // (training_dg.batch_size*epochs)
 print("Steps per epoch: {}".format(steps_per_epoch))
-#%%
-generator = dg.generateBatches(dataset)
+generator = training_dg.generateBatches(dataset, augmentation_factor)
 #%%
 model_path = ic.train(generator, epochs, steps_per_epoch)
 #%%
-# Testing
-th.analyse_data(model_path, dg.generateBatches(X_val), img_size)
+test_dataset = X_val
+#%%
+# Plotting some of the results from separated dataset
+# th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size)
+#%%
+# Analyse Results
+th.analyse_results(model_path, training_dg.generateBatches(test_dataset), img_size)
+#%%
+# Create Submission

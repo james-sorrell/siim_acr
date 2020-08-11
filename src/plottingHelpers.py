@@ -69,7 +69,6 @@ class PlottingController():
         plt.ylabel('Counts')
         plt.show()
         
-        
         male_train_data = train_data[train_data['patient_sex']=='M']
         female_train_data = train_data[train_data['patient_sex']=='F']
         male_positive_count = len(male_train_data[male_train_data['pneumothorax']==True])
@@ -90,17 +89,6 @@ class PlottingController():
         ax.text(1, female_positive_count*0.7, "{:.2f}%".format(female_positive_percentage), horizontalalignment='center', fontsize=12)
         ax.legend()
         plt.show()
-
-        # plt.figure()
-        # print(pneumo_age)
-        # print(type(pneumo_age))
-        
-        # plt.figure()
-        # plot_frame = pd.DataFrame({'Patient Sex': train_data['patient_sex']})
-        # plot_frame.apply(pd.value_counts).plot(kind='bar', subplots=True, \
-        #                                        grid=True, legend=False)
-        # plt.ylabel("Counts")
-        # plt.show()
         
         total_samples = len(train_data)
         print("Total Number of Training Samples: {}".format(total_samples))

@@ -64,7 +64,6 @@ class InferenceController():
         output = Add()([shortcut, res])
         return output
     
-    
     def dsc(self, y_true, y_pred):
         smooth = 1.
         y_true_f = Flatten()(y_true)
@@ -85,7 +84,6 @@ class InferenceController():
         corresponding ground truth. 
         # https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation/overview/evaluation
         """
-        
         loss = binary_crossentropy(y_true, y_pred) + self.dice_loss(y_true, y_pred)
         return loss
 
