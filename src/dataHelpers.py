@@ -112,7 +112,7 @@ class DataGenerator():
         if crop_data is True:   
             self.selectData()
 
-    def selectData(self, negative_ratio=100):
+    def selectData(self, negative_ratio=1):
         """ Configurations for what data should be removed from the dataset 
             Negative ratio defined to be 1:x Positive to Negative Samples
         """
@@ -166,6 +166,17 @@ class DataGenerator():
         """ Flip image and mask horizontally """
         return cv2.flip(img, 0), cv2.flip(mask, 0)
 
+    def shiftHelper(self, img, ox, oy):
+        """ Shifting operation """
+        non = lambda s: s if s<0 else None
+        mom = lambda s: max(0,s)
+        new_img = np.zeros(img.shape)
+        new_img[mom(oy):non(oy), mom(ox):non(ox)] = img[mom(-oy):non(-oy), mom(-ox):non(-ox)]
+        return new_img
+
+    def shift(self, img, mask, ox, oy):
+        return self.shiftHelper(img, ox, oy), self.shiftHelper(mask, ox, oy)
+
     def augmentData(self, img, mask):
         """ Provide a set of augmentations to the dataset, this should help with 
         algorithm robustness """
@@ -182,6 +193,11 @@ class DataGenerator():
         if self.chance(75):
             angle = int(random.uniform(-35, 35))
             img, mask = self.rotate(img, mask, angle)
+        # translation
+        if self.chance(40):
+            ox = random.randint(-40,40)
+            oy = random.randint(-40,40)
+            img, mask = self.shift(img, mask, ox, oy)
         return img, mask
 
     def splitSelectedData(self, val_size=0.2):
