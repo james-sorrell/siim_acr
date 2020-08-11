@@ -162,6 +162,10 @@ class DataGenerator():
         """ Flip image and mask horizontally """
         return cv2.flip(img, 1), cv2.flip(mask, 1)
 
+    def vertical_flip(self, img, mask):
+        """ Flip image and mask horizontally """
+        return cv2.flip(img, 0), cv2.flip(mask, 0)
+
     def augmentData(self, img, mask):
         """ Provide a set of augmentations to the dataset, this should help with 
         algorithm robustness """
@@ -171,9 +175,12 @@ class DataGenerator():
         # flip horizontal
         if self.chance(50):
             img, mask = self.horizontal_flip(img, mask)
+        # flip vertical
+        if self.chance(50):
+            img, mask = self.vertical_flip(img, mask)
         # rotation
-        if self.chance(90):
-            angle = int(random.uniform(-40, 40))
+        if self.chance(75):
+            angle = int(random.uniform(-35, 35))
             img, mask = self.rotate(img, mask, angle)
         return img, mask
 

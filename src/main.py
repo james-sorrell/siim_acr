@@ -67,6 +67,6 @@ def main(model_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Model Benchmarking Tool')
-    parser.add_argument('path', default=None, type=str, help='path to model')
+    parser.add_argument('-path', default=None, type=str, help='path to model')
     options = parser.parse_args()
     main(options.path)
