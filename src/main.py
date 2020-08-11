@@ -49,4 +49,4 @@ generator = dg.generateBatches(dataset)
 model_path = ic.train(generator, epochs, steps_per_epoch)
 #%%
 # Testing
-th.analyse_data('../models/2020-11-08-00-05.h5', dg.generateBatches(X_val), img_size)
+th.analyse_data(model_path, dg.generateBatches(X_val), img_size)

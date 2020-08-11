@@ -106,7 +106,7 @@ class DataGenerator():
         self.batch_size = batch_size
         # Generate Masks for use in Data Generator
         self.masks = {}
-        for index, row in self.train_data[self.train_data['pneumothorax']==1].iterrows():
+        for index, row in self.train_data[self.train_data['pneumothorax']==True].iterrows():
             self.masks[row['id']] = list(row['encoded_pixels_list'])
         self.selectTrainingData()
         
@@ -131,7 +131,7 @@ class DataGenerator():
         X = np.empty((self.batch_size, self.img_size, self.img_size, self.channels))
         y = np.empty((self.batch_size, self.img_size, self.img_size, self.channels))
         for idx, file_path in enumerate(file_list):
-            id = file_path.split('/')[-1][:-4]
+            id = file_path.split('\\')[-1][:-4]
             rle = self.masks.get(id)
             image = pydicom.read_file(file_path).pixel_array
             image_resized = cv2.resize(image, (self.img_size, self.img_size))
