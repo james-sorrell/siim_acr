@@ -36,14 +36,14 @@ class InferenceController():
         return path
         
     def bn_act(self, x, act=True):
-        'batch normalization layer with an optinal activation layer'
+        """ batch normalization layer with an optinal activation layer """
         x = tf.keras.layers.BatchNormalization()(x)
         if act == True:
             x = tf.keras.layers.Activation('relu')(x)
         return x
     
     def conv_block(self, x, filters, kernel_size=3, padding='same', strides=1):
-        'convolutional layer which always uses the batch normalization layer'
+        """ convolutional layer which always uses the batch normalization layer """
         conv = self.bn_act(x)
         conv = Conv2D(filters, kernel_size, padding=padding, strides=strides)(conv)
         return conv
