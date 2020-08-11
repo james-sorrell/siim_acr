@@ -5,7 +5,7 @@
 Pneumothorax can be caused by a blunt chest injury, damage from underlying lung disease, or most horrifying—it may occur for no obvious reason at all. On some occasions, a collapsed lung can be a life-threatening event.
 
 ![Sample Pneuomothorax Annotation](imgs/annotation_examples/1.png)
-![Prediction Example](imgs/prediction_examples/9.png)
+![Prediction Example](imgs/prediction_examples/post_augmentation/9.png)
 
 Pneumothorax is usually diagnosed by a radiologist on a chest x-ray, and can sometimes be very difficult to confirm. An accurate AI algorithm to detect pneumothorax would be 
 useful in a lot of clinical scenarios. AI could be used to triage chest radiographs for priority interpretation, or to provide a more confident diagnosis for non-radiologists.
