@@ -72,14 +72,11 @@ def dice_coefficient(true, pred):
     # Dice Coefficient is 2 * the Area of Overlap divided by the total number of pixels in both images.
     return np.sum(pred[true==1])*2.0 / (np.sum(pred) + np.sum(true))
 
-def analyse_results(model_path, generator, img_size):
+def analyse_model(model_path, generator, img_size):
     """ Generate some metrics for model performance """
     model = tf.keras.models.load_model(model_path, compile=False)
     model_dir = os.path.dirname(model_path)
-    sum = 0
-    count = 0
-    false_positive = 0
-    false_negative = 0
+    sum, count, correct, false_positive, false_negative = 0, 0, 0, 0, 0
     for x, y in generator:
         predictions = model.predict(x)
         for idx, val in enumerate(x):
@@ -90,17 +87,16 @@ def analyse_results(model_path, generator, img_size):
             dice_coef = dice_coefficient(mask, pred)
             if (diagnosis == pred_diagnosis ):
                 correct += 1
-            elif (diagnosis is True and pred_diagnosis is False):
+            elif (diagnosis == True and pred_diagnosis == False):
                 false_negative += 1
-            elif (diagnosis is False and pred_diagnosis is True):
+            elif (diagnosis == False and pred_diagnosis == True):
                 false_positive += 1
             sum += dice_coef
             count += 1
-            print("Diagnosis: {}, Pred Diagnosis: {}".format(diagnosis, pred_diagnosis))
-    print("Mean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count))
+    print("\nMean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count))
     correct_p = 100*(correct/count)
     incorrect_p = 100*((false_negative+false_positive)/count)
     fp_p = 100*(false_positive/count)
     fn_p = 100*(false_negative/count)
-    print("Correct: {:.2f}, Incorrect: {:2.f}\nFalse Positive: {:2.f}, False Negative: {:2.f}".format(correct_p, incorrect_p, fp_p, fn_p))
+    print("Correct: {:.2f}, Incorrect: {:.2f}\nFalse Positive: {:.2f}, False Negative: {:.2f}".format(correct_p, incorrect_p, fp_p, fn_p))
     
