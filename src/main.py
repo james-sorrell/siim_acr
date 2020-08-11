@@ -34,7 +34,6 @@ for X, y in dg.generateBatches(dg.selected_train_data['file_path'].values):
     print("Y type: {}".format(y.dtype))
     break
 #%%
-#%% Inference Controller
 ic = ih.InferenceController(img_size=img_size)
 #%%
 # dataset = dg.selected_train_data

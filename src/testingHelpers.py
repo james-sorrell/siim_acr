@@ -9,6 +9,7 @@ Testing Helper Functions and Classes
 # Imports for Testing
 import tensorflow as tf
 import numpy as np
+from skimage import morphology
 import matplotlib.pyplot as plt
 
 def plot_train(img, mask, pred):
@@ -27,6 +28,18 @@ def plot_train(img, mask, pred):
     
     plt.show()
 
+def remove_small_regions(img, size):
+    """Morphologically removes small (less than size) connected regions of 0s or 1s."""
+    img = morphology.remove_small_objects(img, size)
+    img = morphology.remove_small_holes(img, size)
+    return img
+
+def prediction_post_processing(self, img_size):
+    """ Post processing pipeline for predictions """
+    pred = np.reshape(predictions[idx], (img_size, img_size))
+    pred = pred > 0.5
+    return remove_small_regions(pred, 0.02*img_size)
+
 def analyse_data(model_path, generator, img_size):
     """ Load model from path and test it """
     model = tf.keras.models.load_model(model_path, compile=False)
@@ -40,8 +53,8 @@ def analyse_data(model_path, generator, img_size):
                 #if y[idx].sum() > 0 and count <= 15: 
                     img = np.reshape(x[idx]* 255, (img_size, img_size))
                     mask = np.reshape(y[idx]* 255, (img_size, img_size))
-                    pred = np.reshape(predictions[idx], (img_size, img_size))
-                    pred = pred > 0.5
+                    pred = prediction_post_processing(pred, img_size)
+                    # Scale for visualisation
                     pred = pred * 255
                     plot_train(img, mask, pred)
                     count += 1
