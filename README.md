@@ -23,9 +23,10 @@ All data and information regarding this project has been taken from the followin
 ![Brightness](imgs/augmentations/brightness.png)
 ![Horizontal Flip](imgs/augmentations/h_flip.png)
 
-- Some of the training images seem poor in quality (See imgs/11.png), I have noticed multiple training images that look like this. One of the images was upside down (See prediction_examples/6.png). Augmentation should hopefully help with this, additional analysis of the rate of pneumo positive images that are distorted could be helpful. I have removed a small number of images that were flagged in training as Pneumo positive but do not have any annotation.
+- Some of the training images seem poor in quality (See annotation_examples/11.png), I have noticed multiple training images that look like this. One of the images was upside down (See prediction_examples/6.png). Augmentation should hopefully help with this, additional analysis of the rate of pneumo positive images that are distorted could be helpful. I have removed a small number of images that were flagged in training as Pneumo positive but do not have any annotation.
 
 ![Shifted Image](imgs/annotation_examples/11.png)
+![Upside Down Image](imgs/prediction_examples/6.png)
 
 - The images seem to be at varying scales and rotations, it could be beneficial to isolate the lung area using a separate algorithm and remove the rest of the image.
 
