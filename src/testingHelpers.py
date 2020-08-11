@@ -7,6 +7,7 @@ Testing Helper Functions and Classes
 """
 
 import os
+import json
 # Imports for Testing
 import tensorflow as tf
 import numpy as np
@@ -75,12 +76,17 @@ def plot_results(model_path, generator, img_size, save_path=None):
 def dice_coefficient(true, pred):
     """ Simple function to calculate dice loss coefficient """
     # Dice Coefficient is 2 * the Area of Overlap divided by the total number of pixels in both images.
-    return np.sum(pred[true==1])*2.0 / (np.sum(pred) + np.sum(true))
+    true = np.asarray(true).astype(np.bool)
+    pred = np.asarray(pred).astype(np.bool)
+    if not (np.sum(true) + np.sum(pred)):
+        return 1.0
+    # NOTE: Can add epsilon for smoothing
+    return (2. * np.sum(true * pred)) / (np.sum(true) + np.sum(pred))
 
 def analyse_model(model_path, generator, img_size):
     """ Generate some metrics for model performance """
     model = tf.keras.models.load_model(model_path, compile=False)
-    # model_dir = os.path.dirname(model_path)
+    model_dir = os.path.dirname(model_path)
     sum, count, correct, false_positive, false_negative = 0, 0, 0, 0, 0
     for x, y in generator:
         predictions = model.predict(x)
@@ -99,10 +105,19 @@ def analyse_model(model_path, generator, img_size):
                 false_positive += 1
             sum += dice_coef
             count += 1
-    c.debugPrint("\nMean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count), 0)
+    c.debugPrint("Mean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count), 0)
     correct_p = 100*(correct/count)
     incorrect_p = 100*((false_negative+false_positive)/count)
     fp_p = 100*(false_positive/count)
     fn_p = 100*(false_negative/count)
     c.debugPrint("Correct: {:.2f}, Incorrect: {:.2f}\nFalse Positive: {:.2f}, False Negative: {:.2f}".format(correct_p, incorrect_p, fp_p, fn_p), 0)
-    
+    results = {}
+    results['total_tested'] = count
+    results['correct'] = correct
+    results['correct_percentage'] = correct_p
+    results['false_positive_percentage'] = fp_p
+    results['false_negative_percentage'] = fn_p
+    results['dice_coefficient'] = dice_coef
+    results_loc = os.path.join(model_dir, 'results.json')
+    with open(results_loc, 'w') as fp:
+        json.dump(results, fp)
