@@ -83,7 +83,8 @@ def analyse_model(model_path, generator, img_size):
             mask = np.reshape(y[idx]* 255, (img_size, img_size))
             diagnosis = np.any(mask)
             pred = np.reshape(predictions[idx], (img_size, img_size))
-            pred_diagnosis = np.any(pred > 0.5)
+            pred = prediction_post_processing(pred, img_size)
+            pred_diagnosis = np.any(pred)
             dice_coef = dice_coefficient(mask, pred)
             if (diagnosis == pred_diagnosis ):
                 correct += 1
