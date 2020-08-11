@@ -194,11 +194,11 @@ class DataGenerator():
         if self.chance(75):
             angle = int(random.uniform(-40, 40))
             img, mask = self.rotate(img, mask, angle)
-        # translation
-        if self.chance(40):
-            ox = random.randint(-40,40)
-            oy = random.randint(-40,40)
-            img, mask = self.shift(img, mask, ox, oy)
+        # # translation
+        # if self.chance(40):
+        #     ox = random.randint(-40,40)
+        #     oy = random.randint(-40,40)
+        #     img, mask = self.shift(img, mask, ox, oy)
         return img, mask
 
     def splitSelectedData(self, val_size=0.2):
@@ -209,7 +209,7 @@ class DataGenerator():
         X_train, X_val, _, _ = train_test_split(self.selected_data.index, self.selected_data['pneumothorax'].values, test_size=val_size, random_state=42)
         return self.selected_data.loc[X_train]['file_path'].values, self.selected_data.loc[X_val]['file_path'].values
         
-    def prepareImages(self, file_list):
+    def prepareImages(self, file_list, augment_data):
         """ Takes list of files and returns preprocessed images/labels for training """
         X = np.empty((self.batch_size, self.img_size, self.img_size, self.channels))
         y = np.empty((self.batch_size, self.img_size, self.img_size, self.channels))
@@ -233,7 +233,8 @@ class DataGenerator():
                         mask += rle2mask(r, 1024, 1024).T
             
             mask_resized = cv2.resize(mask, (self.img_size, self.img_size))
-            image_resized, mask_resized = self.augmentData(image_resized, mask_resized)
+            if augment_data == True:
+                image_resized, mask_resized = self.augmentData(image_resized, mask_resized)
             X[idx, ] = np.expand_dims(image_resized, axis=2)
             y[idx,] = np.expand_dims(mask_resized, axis=2)
         # Normalise
@@ -241,7 +242,7 @@ class DataGenerator():
         y = (y>0).astype(np.float64)
         return X, y
         
-    def generateBatches(self, fns, augmentation_factor=1, shuffle=True):
+    def generateBatches(self, fns, augmentation_factor=1, shuffle=True, augment_data=True):
         """ Generate Data to Supply to Fit Function """
         
         # self.selected_train_data['file_path']
@@ -257,6 +258,6 @@ class DataGenerator():
             index = 0
             while (batches < total_data//self.batch_size):
                 c.debugPrint("Index Range: {}:{}".format(index, index+self.batch_size), 2)
-                yield self.prepareImages(fns[index:index+self.batch_size])
+                yield self.prepareImages(fns[index:index+self.batch_size], augment_data)
                 index += self.batch_size
                 batches += 1

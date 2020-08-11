@@ -9,6 +9,7 @@ Inference Helper Functions and Classes to process SIIM ACR Data
 # Imports for Inference
 import datetime
 import tensorflow as tf
+import config as c
 from tensorflow import reduce_sum
 from tensorflow.keras.backend import pow
 from tensorflow.keras.models import Model
@@ -32,6 +33,7 @@ class InferenceController():
         # running more epoch to see if we can get better results
         history = self.model.fit(generator, steps_per_epoch=steps_per_epoch, epochs=epochs, verbose=1)
         timestr = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        c.createFolder('../models/{}'.format(timestr))
         path = '../models/{}/{}.h5'.format(timestr, timestr)
         self.model.save(path)
         return path

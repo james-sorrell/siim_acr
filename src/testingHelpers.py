@@ -80,14 +80,14 @@ def dice_coefficient(true, pred):
     pred = np.asarray(pred).astype(np.bool)
     if not (np.sum(true) + np.sum(pred)):
         return 1.0
-    # NOTE: Can add epsilon for smoothing
+    # NOTE: Could add smoothing
     return (2. * np.sum(true * pred)) / (np.sum(true) + np.sum(pred))
 
 def analyse_model(model_path, generator, img_size):
     """ Generate some metrics for model performance """
     model = tf.keras.models.load_model(model_path, compile=False)
     model_dir = os.path.dirname(model_path)
-    sum, count, correct, false_positive, false_negative = 0, 0, 0, 0, 0
+    p_dice_sum, p_count, dice_sum, count, correct, false_positive, false_negative = 0, 0, 0, 0, 0, 0, 0
     for x, y in generator:
         predictions = model.predict(x)
         for idx, val in enumerate(x):
@@ -103,9 +103,13 @@ def analyse_model(model_path, generator, img_size):
                 false_negative += 1
             elif (diagnosis == False and pred_diagnosis == True):
                 false_positive += 1
-            sum += dice_coef
+            if (diagnosis == True):
+                p_dice_sum += dice_coef
+                p_count += 1
+            dice_sum += dice_coef
             count += 1
-    c.debugPrint("Mean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count), 0)
+    c.debugPrint("Mean Dice Coefficient: {:.2f} from {} test samples.".format(dice_sum/count, count), 0)
+    c.debugPrint("Mean Positive Dice Coeff: {:.2f}".format(p_dice_sum/p_count), 0)
     correct_p = 100*(correct/count)
     incorrect_p = 100*((false_negative+false_positive)/count)
     fp_p = 100*(false_positive/count)
@@ -117,7 +121,9 @@ def analyse_model(model_path, generator, img_size):
     results['correct_percentage'] = correct_p
     results['false_positive_percentage'] = fp_p
     results['false_negative_percentage'] = fn_p
-    results['dice_coefficient'] = dice_coef
+    results['mean_dice_coefficient'] = dice_sum/count
+    results['mean_positive_dice_coefficient'] = p_dice_sum/p_count
+    results['positive_count'] = p_count
     results_loc = os.path.join(model_dir, 'results.json')
     with open(results_loc, 'w') as fp:
         json.dump(results, fp)

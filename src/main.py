@@ -50,10 +50,10 @@ def main(model_path):
     test_dataset = X_val
     #%%
     # Plotting some of the results from test dataset
-    th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size, model_path)
+    th.plot_results(model_path, training_dg.generateBatches(test_dataset, augment_data=False), img_size, model_path)
     #%%
     # Analyse Results
-    th.analyse_model(model_path, training_dg.generateBatches(test_dataset), img_size)
+    th.analyse_model(model_path, training_dg.generateBatches(test_dataset, augment_data=False), img_size)
     #%%
     # Create Submission
 
