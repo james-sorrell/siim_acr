@@ -11,3 +11,11 @@ useful in a lot of clinical scenarios. AI could be used to triage chest radiogra
 
 All data and information regarding this project has been taken from the following Kaggle Competition
   https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation/overview/description
+
+> Sandbox | Ideas and Notes
+
+- Some of the training images seem poor in quality (See imgs/11.png), I have noticed multiple training images that look like this. It could be beneficial to remove this data from the training. One of the images was upside down (See prediction_examples/6.png).
+
+- The images seem to be at varying scales and rotations, this could make the problem more complicated than it potentially needs to be. This can potentially be adressed by isolating the chest/lung area from the image/mask before scaling.
+
+- Potentially create a separate Model for inference on Men and Women. Images are significantly different, could be room for potential prediction improvements.
