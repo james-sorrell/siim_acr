@@ -33,6 +33,6 @@ All data and information regarding this project has been taken from the followin
 
 - Algorithm utilised was simply Res-U-Net, there are many other options for semantic segmentation and it would be worth exploring these given the hardware and time to do so.
 
-- Evaluation Metrics - At this stage evaluation metrics after model development is the Dice Coefficient. It would be useful in a practical case utilise an AUC-ROC metric to determine false-positive/negative rates of the Algorithm. Would be good to have a stronger understanding of the prediction False-Positive rates as a function of area as well as detection.
+- Evaluation Metrics - At this stage evaluation metrics after model development is the Dice Coefficient. It could be useful to determine false-positive/negative rates of the Algorithm. Would be good to have a stronger understanding of the prediction False-Positive rates as a function of area as well as detection. Pixel Accuracy may be a realtively confusing metric due to the high class imbalance nature of this problem, Intersection over Union would have limited use in my opinion as they are positively correlated.
 
 - Evaluation Visualisation - Currently I am just using the Dice Coefficient to measure performance against a fraction of the training data that has been isolated from the data used to train the model. It would be good to run training multiple times and assess the performance against multiple slices of the training data.

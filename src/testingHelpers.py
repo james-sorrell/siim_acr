@@ -6,13 +6,14 @@ Testing Helper Functions and Classes
 
 """
 
+import os
 # Imports for Testing
 import tensorflow as tf
 import numpy as np
 from skimage import morphology
 import matplotlib.pyplot as plt
 
-def plot_train(img, mask, pred):
+def plot_train(img, mask, pred, save_path=None):
     """ Take an image, mask and predicted mask and plot them for inspection """
     
     fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,5))
@@ -26,10 +27,13 @@ def plot_train(img, mask, pred):
     ax[2].imshow(pred, cmap=plt.cm.bone)
     ax[2].set_title('Pred Mask')
     
+    if save_path is not None:
+        plt.savefig(save_path)
+
     plt.show()
 
 def remove_small_regions(img, size):
-    """Morphologically removes small (less than size) connected regions of 0s or 1s."""
+    """Morphologically removes small connected regions of 0s or 1s."""
     img = morphology.remove_small_objects(img, size)
     img = morphology.remove_small_holes(img, size)
     return img
@@ -39,7 +43,7 @@ def prediction_post_processing(pred, img_size):
     pred = pred > 0.5
     return remove_small_regions(pred, 0.02*img_size)
 
-def plot_results(model_path, generator, img_size):
+def plot_results(model_path, generator, img_size, save_path=None):
     """ Load model from path and test it """
     model = tf.keras.models.load_model(model_path, compile=False)
     # lets loop over the predictions and print some good-ish results
@@ -56,7 +60,11 @@ def plot_results(model_path, generator, img_size):
                     pred = prediction_post_processing(pred, img_size)
                     # Scale for visualisation
                     pred = pred * 255
-                    plot_train(img, mask, pred)
+                    if save_path is not None:
+                        # Plots are overwriting each other, needs to be done better
+                        # but don't want to save all the plots into the repo
+                        save_path = os.path.join(save_path, "images", "{}.png".format(idx))
+                    plot_train(img, mask, pred, save_path)
                     count += 1
 
 def dice_coefficient(true, pred):
@@ -67,14 +75,32 @@ def dice_coefficient(true, pred):
 def analyse_results(model_path, generator, img_size):
     """ Generate some metrics for model performance """
     model = tf.keras.models.load_model(model_path, compile=False)
+    model_dir = os.path.dirname(model_path)
     sum = 0
     count = 0
+    false_positive = 0
+    false_negative = 0
     for x, y in generator:
         predictions = model.predict(x)
         for idx, val in enumerate(x):
             mask = np.reshape(y[idx]* 255, (img_size, img_size))
+            diagnosis = np.any(mask)
             pred = np.reshape(predictions[idx], (img_size, img_size))
+            pred_diagnosis = np.any(pred > 0.5)
             dice_coef = dice_coefficient(mask, pred)
+            if (diagnosis == pred_diagnosis ):
+                correct += 1
+            elif (diagnosis is True and pred_diagnosis is False):
+                false_negative += 1
+            elif (diagnosis is False and pred_diagnosis is True):
+                false_positive += 1
             sum += dice_coef
             count += 1
+            print("Diagnosis: {}, Pred Diagnosis: {}".format(diagnosis, pred_diagnosis))
     print("Mean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count))
+    correct_p = 100*(correct/count)
+    incorrect_p = 100*((false_negative+false_positive)/count)
+    fp_p = 100*(false_positive/count)
+    fn_p = 100*(false_negative/count)
+    print("Correct: {:.2f}, Incorrect: {:2.f}\nFalse Positive: {:2.f}, False Negative: {:2.f}".format(correct_p, incorrect_p, fp_p, fn_p))
+    

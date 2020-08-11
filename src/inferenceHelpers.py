@@ -28,10 +28,11 @@ class InferenceController():
         self.model.compile(optimizer=adam, loss=self.bce_dice_loss, metrics=[self.dsc])
                
     def train(self, generator, epochs, steps_per_epoch):
+        """ Run training and save the model to models folder """
         # running more epoch to see if we can get better results
         history = self.model.fit(generator, steps_per_epoch=steps_per_epoch, epochs=epochs, verbose=1)
         timestr = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        path = '../models/{}.h5'.format(timestr)
+        path = '../models/{}/{}.h5'.format(timestr)
         self.model.save(path)
         return path
         
@@ -93,6 +94,7 @@ class InferenceController():
         return c
 
     def ResUNet(self):
+        """ Define ResUNet from blocks """
         f = [16, 32, 64, 128, 256, 512, 1024, 2048] * 32
         inputs = Input((self.img_size, self.img_size, 1))
         

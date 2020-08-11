@@ -11,7 +11,7 @@ Some training images have multiple annotations.
 
 @author: James Sorrell
 
-Data Preparation Inspired By:
+Data Loader Inspired By:
     https://www.kaggle.com/ekhtiar/lung-segmentation-cropping-resunet-tf-keras
     https://www.kaggle.com/ekhtiar/finding-pneumo-part-1-eda-and-unet
 

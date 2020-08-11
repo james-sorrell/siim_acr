@@ -49,7 +49,7 @@ model_path = ic.train(generator, epochs, steps_per_epoch)
 #%%
 test_dataset = X_val
 #%%
-# Plotting some of the results from separated dataset
+# Plotting some of the results from test dataset
 # th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size)
 #%%
 # Analyse Results
