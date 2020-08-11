@@ -57,7 +57,7 @@ def main(model_path):
     test_dataset = X_val
     #%%
     # Plotting some of the results from test dataset
-    # th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size)
+    th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size)
     #%%
     # Analyse Results
     th.analyse_model(model_path, training_dg.generateBatches(test_dataset), img_size)

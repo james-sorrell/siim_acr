@@ -175,6 +175,7 @@ class DataGenerator():
         return new_img
 
     def shift(self, img, mask, ox, oy):
+        """ Shift image and mask by specified values """
         return self.shiftHelper(img, ox, oy), self.shiftHelper(mask, ox, oy)
 
     def augmentData(self, img, mask):
@@ -191,7 +192,7 @@ class DataGenerator():
             img, mask = self.vertical_flip(img, mask)
         # rotation
         if self.chance(75):
-            angle = int(random.uniform(-35, 35))
+            angle = int(random.uniform(-40, 40))
             img, mask = self.rotate(img, mask, angle)
         # translation
         if self.chance(40):

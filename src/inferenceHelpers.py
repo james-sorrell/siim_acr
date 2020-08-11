@@ -18,7 +18,7 @@ from tensorflow.keras.losses import binary_crossentropy
 class InferenceController():
     """ 
     Inference Controller Class
-    Class that handles Inference and Preprocessing
+    Class that handles Inference, Training & Model Saving
     """
 
     def __init__(self, img_size, lr=0.01, eps=0.1):
