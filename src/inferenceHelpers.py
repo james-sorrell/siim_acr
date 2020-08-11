@@ -32,7 +32,7 @@ class InferenceController():
         # running more epoch to see if we can get better results
         history = self.model.fit(generator, steps_per_epoch=steps_per_epoch, epochs=epochs, verbose=1)
         timestr = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        path = '../models/{}/{}.h5'.format(timestr)
+        path = '../models/{}/{}.h5'.format(timestr, timestr)
         self.model.save(path)
         return path
         

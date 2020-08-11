@@ -33,13 +33,6 @@ def main(model_path):
     X_train, X_val = training_dg.splitSelectedData(0.01)
     #%%
     if model_path is None:
-        # If we specified a path skip model generation
-        for X, y in training_dg.generateBatches(X_train):
-            print("X: {}".format(X.shape))
-            print("y: {}".format(y.shape))
-            print("X type: {}".format(X.dtype))
-            print("Y type: {}\n".format(y.dtype))
-            break
         #%%
         ic = ih.InferenceController(img_size=img_size)
         #%%
@@ -47,7 +40,7 @@ def main(model_path):
         #dataset = training_dg.selected_data['file_path'].values 
         print("Training Data Length: {}".format(len(dataset)))
         epochs = 100
-        augmentation_factor = 10
+        augmentation_factor = 100
         steps_per_epoch = (len(dataset)*augmentation_factor) // (training_dg.batch_size*epochs)
         print("Steps per epoch: {}".format(steps_per_epoch))
         generator = training_dg.generateBatches(dataset, augmentation_factor)
@@ -57,7 +50,7 @@ def main(model_path):
     test_dataset = X_val
     #%%
     # Plotting some of the results from test dataset
-    th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size)
+    th.plot_results(model_path, training_dg.generateBatches(test_dataset), img_size, model_path)
     #%%
     # Analyse Results
     th.analyse_model(model_path, training_dg.generateBatches(test_dataset), img_size)

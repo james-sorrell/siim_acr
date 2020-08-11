@@ -12,6 +12,7 @@ import tensorflow as tf
 import numpy as np
 from skimage import morphology
 import matplotlib.pyplot as plt
+import config as c
 
 def plot_train(img, mask, pred, save_path=None):
     """ Take an image, mask and predicted mask and plot them for inspection """
@@ -27,8 +28,10 @@ def plot_train(img, mask, pred, save_path=None):
     ax[2].imshow(pred, cmap=plt.cm.bone)
     ax[2].set_title('Pred Mask')
     
+    c.debugPrint("Saving to: {}".format(save_path), 2)
     if save_path is not None:
         plt.savefig(save_path)
+    plt.close()
 
 def remove_small_regions(img, size):
     """Morphologically removes small connected regions of 0s or 1s."""
@@ -46,6 +49,9 @@ def plot_results(model_path, generator, img_size, save_path=None):
     model = tf.keras.models.load_model(model_path, compile=False)
     # lets loop over the predictions and print some good-ish results
     count = 0
+    savedImages = 0
+    model_dir = os.path.dirname(model_path)
+    c.createFolder(os.path.join(model_dir, "images"))
     for i in range(0,50):
         if count <= 50:
             x, y = next(generator)
@@ -58,10 +64,11 @@ def plot_results(model_path, generator, img_size, save_path=None):
                     pred = prediction_post_processing(pred, img_size)
                     # Scale for visualisation
                     pred = pred * 255
-                    if save_path is not None:
+                    if save_path is not None and savedImages < 50:
                         # Plots are overwriting each other, needs to be done better
                         # but don't want to save all the plots into the repo
-                        save_path = os.path.join(save_path, "images", "{}.png".format(idx))
+                        save_path = os.path.join(model_dir, "images", "{}.png".format(savedImages))
+                        savedImages += 1
                     plot_train(img, mask, pred, save_path)
                     count += 1
 
@@ -73,7 +80,7 @@ def dice_coefficient(true, pred):
 def analyse_model(model_path, generator, img_size):
     """ Generate some metrics for model performance """
     model = tf.keras.models.load_model(model_path, compile=False)
-    model_dir = os.path.dirname(model_path)
+    # model_dir = os.path.dirname(model_path)
     sum, count, correct, false_positive, false_negative = 0, 0, 0, 0, 0
     for x, y in generator:
         predictions = model.predict(x)
@@ -92,10 +99,10 @@ def analyse_model(model_path, generator, img_size):
                 false_positive += 1
             sum += dice_coef
             count += 1
-    print("\nMean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count))
+    c.debugPrint("\nMean Dice Coefficient: {:.2f} from {} test samples.".format(sum/count, count), 0)
     correct_p = 100*(correct/count)
     incorrect_p = 100*((false_negative+false_positive)/count)
     fp_p = 100*(false_positive/count)
     fn_p = 100*(false_negative/count)
-    print("Correct: {:.2f}, Incorrect: {:.2f}\nFalse Positive: {:.2f}, False Negative: {:.2f}".format(correct_p, incorrect_p, fp_p, fn_p))
+    c.debugPrint("Correct: {:.2f}, Incorrect: {:.2f}\nFalse Positive: {:.2f}, False Negative: {:.2f}".format(correct_p, incorrect_p, fp_p, fn_p), 0)
     

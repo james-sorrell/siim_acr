@@ -99,7 +99,7 @@ class DataGenerator():
     Will supply data lazily for ML Inference.
     """
     
-    def __init__(self, data, img_size, batch_size=16, channels=1, crop_data=True, augment_data=True):
+    def __init__(self, data, img_size, batch_size=16, channels=1, crop_data=True):
         # Data Generator configurations
         self.data = data
         self.img_size = img_size
