@@ -39,3 +39,9 @@ All data and information regarding this project has been taken from the followin
 - Evaluation Visualisation - Currently I am just using the Dice Coefficient to measure performance against a fraction of the training data that has been isolated from the data used to train the model. It would be good to run training multiple times and assess the performance against multiple slices of the training data.
 
 - Post Processing - There are a variety of post-processing algorithms that could be applied to help improve results in this competition based on the probability of a sample being positive in the surrouding prediction landscape. This could definitely be worth investigating.
+
+> Future
+
+https://openreview.net/pdf?id=SkgC6TNFvr
+
+RL for Semantic Segmentation - The idea is that it is more sample efficient, which may make some intuitive sense as it doesn't need to reconstruc the mask image but insteaed chooses actions, could be interesting to try.

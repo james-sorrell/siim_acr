@@ -194,11 +194,11 @@ class DataGenerator():
         if self.chance(75):
             angle = int(random.uniform(-40, 40))
             img, mask = self.rotate(img, mask, angle)
-        # # translation
-        # if self.chance(40):
-        #     ox = random.randint(-40,40)
-        #     oy = random.randint(-40,40)
-        #     img, mask = self.shift(img, mask, ox, oy)
+        # translation
+        if self.chance(40):
+            ox = random.randint(-40,40)
+            oy = random.randint(-40,40)
+            img, mask = self.shift(img, mask, ox, oy)
         return img, mask
 
     def splitSelectedData(self, val_size=0.2):
