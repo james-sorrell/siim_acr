@@ -123,11 +123,12 @@ class DataGenerator():
         num_positive_samples = len(self.selected_data[self.selected_data['pneumothorax']==True])
         num_negative_allowed = negative_ratio*num_positive_samples
         num_negative_samples = len(self.selected_data[self.selected_data['pneumothorax']==False])
-        num_negative_drop = num_positive_samples - num_negative_allowed
+        num_negative_drop = num_negative_samples - num_negative_allowed
+        print("\nNegative Ratio: {}".format(negative_ratio))
         if num_negative_drop < 0:
             num_negative_drop = 0
         # num_negative_drop -= len(self.selected_data[self.selected_data['pneumothorax']==True])
-        c.debugPrint("\nDropping {} of the Negative Class!\n".format(num_negative_drop), 1)
+        c.debugPrint("Dropping {} of the Negative Class!\n".format(num_negative_drop), 1)
         # Remove 'n' samples from the Negative Class as it outnumbers the positive Class
         drop_data = self.selected_data[self.selected_data['pneumothorax']==False].sample(num_negative_drop).index
         self.selected_data = self.selected_data.drop(drop_data)

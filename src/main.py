@@ -56,7 +56,7 @@ def main(model_path):
     th.analyse_model(model_path, training_dg.generateBatches(test_dataset, augment_data=False), img_size)
     #%%
     # Create Submission
-
+    th.prepare_submission(model_path, dc.test_data, img_size)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Model Benchmarking Tool')

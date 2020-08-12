@@ -44,6 +44,7 @@ def plot_train(img, mask, pred, save_path=None):
     if save_path is not None:
         plt.savefig(save_path)
     plt.close()
+    plt.show()
 
 def remove_small_regions(img, size):
     """Morphologically removes small connected regions of 0s or 1s."""
