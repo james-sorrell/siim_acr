@@ -43,8 +43,8 @@ def plot_train(img, mask, pred, save_path=None):
     c.debugPrint("Saving to: {}".format(save_path), 2)
     if save_path is not None:
         plt.savefig(save_path)
-    plt.close()
     plt.show()
+    plt.close()
 
 def remove_small_regions(img, size):
     """Morphologically removes small connected regions of 0s or 1s."""
@@ -120,7 +120,7 @@ def analyse_model(model_path, generator, img_size):
                 p_count += 1
             dice_sum += dice_coef
             count += 1
-    c.debugPrint("Mean Dice Coefficient: {:.2f} from {} test samples.".format(dice_sum/count, count), 0)
+    c.debugPrint("\nMean Dice Coefficient: {:.2f} from {} test samples.".format(dice_sum/count, count), 0)
     c.debugPrint("Mean Positive Dice Coeff: {:.2f}".format(p_dice_sum/p_count), 0)
     correct_p = 100*(correct/count)
     incorrect_p = 100*((false_negative+false_positive)/count)
@@ -162,7 +162,6 @@ def prepare_submission(model_path, test_data, img_size):
     submission = []
     print("Test Data: {}".format(len(test_data)))
     for i, row in test_data.iterrows():
-        print("{}".format(i))
         test_img = get_test_tensor(test_data['file_path'][i],1,img_size,1)
         # Get prediction
         pred_mask = model.predict(test_img).reshape((img_size, img_size))
@@ -176,6 +175,7 @@ def prepare_submission(model_path, test_data, img_size):
         else:
             prediction['EncodedPixels'] = mask2rle(pred_mask.T * 255, 1024, 1024)
         submission.append(prediction)
+    print("Submission Prepared!")
     # submission to csv
     submission_df = pd.DataFrame(submission)
     submission_df = submission_df[['ImageId','EncodedPixels']]
