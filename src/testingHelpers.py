@@ -8,12 +8,23 @@ Testing Helper Functions and Classes
 
 import os
 import json
+import pydicom
+import cv2
 # Imports for Testing
 import tensorflow as tf
 import numpy as np
+import pandas as pd
 from skimage import morphology
 import matplotlib.pyplot as plt
 import config as c
+
+# Import Mask Functions from Provided Files
+# TODO: It would be cleaner to do this as a 
+# module import, but I need to get that working
+# cleanly with Syder, for now this will do
+import sys
+sys.path.insert(0, '../input')
+from mask_functions import rle2mask, mask2rle
 
 def plot_train(img, mask, pred, save_path=None):
     """ Take an image, mask and predicted mask and plot them for inspection """
@@ -42,8 +53,8 @@ def remove_small_regions(img, size):
 
 def prediction_post_processing(pred, img_size):
     """ Post processing pipeline for predictions """
-    pred = pred > 0.5
-    return remove_small_regions(pred, 0.02*img_size)
+    pred = (pred > .5).astype(int)
+    return remove_small_regions(pred, 0.02 * np.prod(1024))
 
 def plot_results(model_path, generator, img_size, save_path=None):
     """ Load model from path and test it """
@@ -127,3 +138,46 @@ def analyse_model(model_path, generator, img_size):
     results_loc = os.path.join(model_dir, 'results.json')
     with open(results_loc, 'w') as fp:
         json.dump(results, fp)
+
+def get_test_tensor(file_path, batch_size, img_size, channels):
+        """ Takes filepath from test dataset and generates batch for processing """
+        X = np.empty((batch_size, img_size, img_size, channels))
+        # Store sample
+        pixel_array = pydicom.read_file(file_path).pixel_array
+        image_resized = cv2.resize(pixel_array, (img_size, img_size))
+        image_resized = np.array(image_resized, dtype=np.float64)
+        image_resized -= image_resized.mean()
+        image_resized /= image_resized.std()
+        X[0,] = np.expand_dims(image_resized, axis=2)
+        return X
+
+def prepare_submission(model_path, test_data, img_size):
+    """ Prepare submission from provided model """
+    # Save location
+    model = tf.keras.models.load_model(model_path, compile=False)
+    model_dir = os.path.dirname(model_path)
+    results_loc = os.path.join(model_dir, 'submission.csv')
+    # Prepare Submission
+    submission = []
+    print("Test Data: {}".format(len(test_data)))
+    for i, row in test_data.iterrows():
+        print("{}".format(i))
+        test_img = get_test_tensor(test_data['file_path'][i],1,img_size,1)
+        # Get prediction
+        pred_mask = model.predict(test_img).reshape((img_size, img_size))
+        prediction = {}
+        prediction['ImageId'] = str(test_data['id'][i])
+        # Resize predicted mask
+        pred_mask = cv2.resize(pred_mask.astype('float32'), (1024, 1024))
+        pred_mask = prediction_post_processing(pred_mask, 1024)
+        if pred_mask.sum() < 1:
+            prediction['EncodedPixels']=  -1
+        else:
+            prediction['EncodedPixels'] = mask2rle(pred_mask.T * 255, 1024, 1024)
+        submission.append(prediction)
+    # submission to csv
+    submission_df = pd.DataFrame(submission)
+    submission_df = submission_df[['ImageId','EncodedPixels']]
+    # check out some predictions and see if it looks good
+    submission_df[ submission_df['EncodedPixels'] != -1].head()
+    submission_df.to_csv(results_loc, index=False)
